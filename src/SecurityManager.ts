@@ -124,39 +124,6 @@ async function getSecretStorageKey(
 
     logger.debug(`getSecretStorageKey: prompting user for key ${keyId}`);
     const inputToKey = makeInputToKey(keyInfo);
-
-    //RJM Temporary Change Start
-    //  In future set up recovery key modes on of which could be to obtain
-    //   the key from some kind of user token
-    const recoveryKeySecurityPhrase = "Temp34HardCoded34.....Phrase1"
-    if (recoveryKeySecurityPhrase !== '') {
-        const input = { passphrase: recoveryKeySecurityPhrase };
-        const key = await inputToKey(input);
-        if (MatrixClientPeg.safeGet().secretStorage.checkKey(key, keyInfo)) {
-            cacheSecretStorageKey(keyId, keyInfo, key);
-            return [keyId, key];
-        }
-
-        // Key not set up at all - set it up
-        const recoveryKey = await MatrixClientPeg.safeGet()
-            .getCrypto()!
-            .createRecoveryKeyFromPassphrase(recoveryKeySecurityPhrase);
-        const crypto = cli.getCrypto();
-
-        await crypto.bootstrapSecretStorage({
-            createSecretStorageKey: async () => recoveryKey!,
-            setupNewSecretStorage: true,
-        });
-        await crypto.bootstrapCrossSigning({
-            authUploadDeviceSigningKeys: true, //this.doBootstrapUIAuth,
-            setupNewCrossSigning: true,
-        });
-
-        cacheSecretStorageKey(keyId, keyInfo, key);
-        return [keyId, key];
-    }
-    //RJM Temporary Change End
-
     const { finished } = Modal.createDialog(
         AccessSecretStorageDialog,
         /* props= */
