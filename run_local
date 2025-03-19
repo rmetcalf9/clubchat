@@ -1,0 +1,4 @@
+
+# run the local server. Can be accessed via 127.0.0.1:8080
+
+docker run --rm -v ./webapp:/usr/share/nginx/html:ro -p 8080:80 nginx
