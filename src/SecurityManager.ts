@@ -103,6 +103,8 @@ async function getSecretStorageKey(
         `getSecretStorageKey: request for 4S keys [${Object.keys(keyInfos)}] for secret \`${secretName}\`: looking for key ${keyId}`,
     );
 
+    console.log('RJM getstoragekey', secretStorageBeingAccessed, secretStorageKeys, keyId, secretStorageKeys[keyId])
+
     // Check the in-memory cache
     if (secretStorageBeingAccessed && secretStorageKeys[keyId]) {
         logger.debug(`getSecretStorageKey: returning key ${keyId} from cache`);
@@ -166,6 +168,7 @@ function cacheSecretStorageKey(
 ): void {
     if (secretStorageBeingAccessed) {
         logger.debug(`Caching 4S key ${keyId}`);
+        console.log('RJM cachking key', keyId);
         secretStorageKeys[keyId] = key;
         secretStorageKeyInfo[keyId] = keyInfo;
     }

@@ -135,6 +135,7 @@ import { LoginSplashView } from "./auth/LoginSplashView";
 import { cleanUpDraftsIfRequired } from "../../DraftCleaner";
 import { InitialCryptoSetupStore } from "../../stores/InitialCryptoSetupStore";
 import { setTheme } from "../../theme";
+import { isUserlessRecoveryPhraseFeatureTurnedOn, setupCrossSigningKeysWithPassphrase } from "../../UserlessRecoveryPhrase";
 
 // legacy export
 export { default as Views } from "../../Views";
@@ -424,7 +425,13 @@ export default class MatrixChat extends React.PureComponent<IProps, IState> {
             if (cryptoExtension.SHOW_ENCRYPTION_SETUP_UI == false) {
                 this.onLoggedIn();
             } else {
-                this.setStateForNewView({ view: Views.COMPLETE_SECURITY });
+                if (isUserlessRecoveryPhraseFeatureTurnedOn()) {
+                  (await setupCrossSigningKeysWithPassphrase({
+                    completeFunction: this.onLoggedIn
+                  }));
+                } else {
+                  this.setStateForNewView({ view: Views.COMPLETE_SECURITY });
+                };
             }
         } else if (
             (await cli.doesServerSupportUnstableFeature("org.matrix.e2e_cross_signing")) &&
